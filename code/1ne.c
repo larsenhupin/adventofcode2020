@@ -1,16 +1,25 @@
 #include<stdio.h>
-
-typedef struct report report;
+#include <stdlib.h>
 
 struct report {
-	int nbOfEntries;
-	char* str;
-	char* err;
+	int count;
 	int entries[];
 };
 
-int getFilelen(FILE *f){
-	int c;
+void initEntries(struct report *r){
+	for (int i = 0; i < r->count; i++){
+		 r->entries[i] = 0;
+	}
+}
+
+void printEntries(struct report *r){
+	for (int i = 0; i < r->count; i++){
+		printf("%i %d\n", i, r->entries[i] );
+	}
+}
+
+int getFilelen(FILE *f){ // getFileInfo
+	char c;
 	int count = 0;
 	if(f){
 		while((c=fgetc(f))!=EOF){
@@ -18,52 +27,55 @@ int getFilelen(FILE *f){
 				count++;
 			}
 		}
-		// Last entry doesn't have a newline
 		count++;
 	}	
 	return count;
 }
 
-report* getDataFromFile(char* filename){
+void getDataFromFile(char* filename){
 	int c;
 	FILE* f = fopen(filename, "r");
 	
+	struct report *r;
 	int filelen = getFilelen(f);
 
-	// Create the struct
-	//report *r = malloc(sizeof(report) +  filelen * sizeof(int));
-	//report* r = malloc(sizeof(report) * (sizeof(int) * filelen));
+	int SizeOfReport = sizeof(struct report);
 
 
-	report* r = malloc(sizeof(report) + filelen * sizeof(int));
+	r = (struct report *)malloc(sizeof(struct report) + sizeof(int) + sizeof(int) * filelen);
 
-	// ------------------------------
-	if(f){
-		while((c=fgetc(f))!=EOF){
-			r->str+=c;
-		}
-	}
-	// ------------------------------
-	r->nbOfEntries = filelen;
-
-	// alloc -------------------------------------------
-
-	for (int i = 0; i < r->nbOfEntries - 1; i++){
-		fscanf(f, "%d,", &r->entries[i] );
+	int SizeOfR = sizeof(r);
+	r->count = 0;
+	if (r == NULL){
+		printf("report is null");
 	}
 
+	r->count = filelen;
 
-	printf("%s", "icant");
+	// get text in memory
+
+	printEntries(r);
+
+	// use atoi with fgetc
+	
+	// --------------------------------------
+	for (int i = 0; i < filelen; i++){
+		printf("%i %d\n", i, r->entries[i] );
+	}
 
 	fclose(f);
+}
 
-	return r;
+int program_run(){
+
+	struct report *r;
+	getDataFromFile("../data/input1.txt");
+
+	return 0;
 }
 
 int main(int argc, char* argv){
 
-	//report* r;
-	report* r = getDataFromFile("../data/input1.txt");
-	printf("%i\n", 2);
+	program_run();
 	return 0;
 }

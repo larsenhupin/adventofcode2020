@@ -2,4 +2,4 @@
 
 # Build
 
-`cl -Zi ..\code\zero.c`
+`cl -Zi ..\code\0ero.c`
