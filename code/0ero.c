@@ -1,8 +1,7 @@
-#define STB_DEFINE
-#include "stb.h"
+#include <stdio.h>
 
 int main(int argc, char* argv){
 
-	//printf("%s", "Ground zero");
+	printf("%s", "Ground zero!\n");
 	return 0;
 }

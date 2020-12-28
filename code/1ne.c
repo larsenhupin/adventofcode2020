@@ -1,4 +1,4 @@
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 struct report {
@@ -6,76 +6,89 @@ struct report {
 	int entries[];
 };
 
-void initEntries(struct report *r){
-	for (int i = 0; i < r->count; i++){
-		 r->entries[i] = 0;
-	}
+struct file {
+  int fileLength;
+  char* buffer;
+};
+
+struct report* getReport(struct file *fInfo){
+  struct report *r;
+  int chiffre;
+
+  int *entries = malloc(sizeof(int) * fInfo->fileLength);
+  
+  char *arr;
+  int array_size = 0;
+  int j = 0;
+  int numberOfChiffre = 0;
+
+  printf("%i bytes\n", fInfo->fileLength);
+
+  for(int i = 0; i < fInfo->fileLength - 1; i++){
+    
+    if(fInfo->buffer[i] != '\n'){
+      arr[j] = fInfo->buffer[i];
+      j++;
+      
+    }
+    else{
+      numberOfChiffre++;
+      if(j > array_size){
+        array_size = j;
+      }
+
+      chiffre = atoi(arr);
+      printf("%i\n", chiffre);
+      
+      for(int i = j; i < array_size; i++){
+        arr[i] = '\0';
+      }
+      j = 0;
+    }
+  }
 }
 
-void printEntries(struct report *r){
-	for (int i = 0; i < r->count; i++){
-		printf("%i %d\n", i, r->entries[i] );
-	}
+void printBuffer(char* buffer, int length){
+  for(int i = 0; i < length; i++){
+    printf("%c", buffer[i]);
+  }
 }
 
-int getFilelen(FILE *f){ // getFileInfo
-	char c;
-	int count = 0;
-	if(f){
-		while((c=fgetc(f))!=EOF){
-			if (c == '\n'){
-				count++;
-			}
-		}
-		count++;
-	}	
-	return count;
+struct file* getFileData(char* filename){
+  struct file *fInfo;
+  char* buffer = 0;
+  int fileLength = 0;
+
+  FILE* f = fopen(filename, "r");
+    
+  if(f){
+    fseek(f, 0, SEEK_END);
+    fileLength = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    buffer = malloc(fileLength);
+    if(buffer){
+      fread(buffer, 1, fileLength, f);
+    }
+  }
+  
+ 	fInfo = (struct file *)malloc(sizeof(struct file) + sizeof(char) + sizeof(int) * fileLength);
+
+  fInfo->fileLength = fileLength;
+  fInfo->buffer = buffer;
+
+  return fInfo; 
 }
 
-void getDataFromFile(char* filename){
-	int c;
-	FILE* f = fopen(filename, "r");
-	
-	struct report *r;
-	int filelen = getFilelen(f);
-
-	int SizeOfReport = sizeof(struct report);
-
-
-	r = (struct report *)malloc(sizeof(struct report) + sizeof(int) + sizeof(int) * filelen);
-
-	int SizeOfR = sizeof(r);
-	r->count = 0;
-	if (r == NULL){
-		printf("report is null");
-	}
-
-	r->count = filelen;
-
-	// get text in memory
-
-	printEntries(r);
-
-	// use atoi with fgetc
-	
-	// --------------------------------------
-	for (int i = 0; i < filelen; i++){
-		printf("%i %d\n", i, r->entries[i] );
-	}
-
-	fclose(f);
-}
-
-int program_run(){
-
-	struct report *r;
-	getDataFromFile("../data/input1.txt");
-
+int program(){
+	struct file *fInfo = getFileData("../data/input1.txt");
+  //printBuffer(fInfo->buffer, fInfo->fileLength);
+  struct report *r = getReport(fInfo);
+  
 	return 0;
 }
 
 int main(int argc, char* argv){
 
-	program_run();
+	program();
 	return 0;
 }
