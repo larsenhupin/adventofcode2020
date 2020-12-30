@@ -1,57 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_CHAR 200
+
 struct report {
-	int count;
 	int entries[];
 };
 
 struct file {
-  int fileLength;
+  int size;
   char* buffer;
+  int lines;
 };
 
-struct report* getReport(struct file *fInfo){
-  struct report *r;
-  int chiffre;
+// Se faire une petite librairie de manipulation de string :)
+void charBufferReinitialisation(char *buffer, int size){
+	for (int i = 0; i < size; i++) {
+		buffer[i] = '\0';
+	}
+}
 
-  int *entries = malloc(sizeof(int) * fInfo->fileLength);
+void parseToIntBuffer(int * entries, struct file fInfo) {
+	char arr[MAX_CHAR] = { '\0' };
+	int nbOfChar = 0;
+	int line = 0;
+	int array_size = 0;
+
+	for (int i = 0; i <= fInfo.size ; i++) {
+		
+		if (fInfo.buffer[i] == '\n') {
+			if (nbOfChar > array_size) {
+				array_size = nbOfChar;
+			}
+			entries[line] = atoi(arr);
+			line++;
+			charBufferReinitialisation(arr, array_size);
+			nbOfChar = 0;
+		}
+		else if(i == fInfo.size){
+			entries[line] = atoi(arr);
+		}
+		else {
+			arr[nbOfChar] = fInfo.buffer[i];
+			nbOfChar++;
+		}
+	}
+}
+
+struct report* createReport(struct file *fInfo){
+
+  struct report *r = malloc(sizeof(int) * fInfo->lines);
+  int *entries = malloc(sizeof(int) * fInfo->lines+1);
+
+  parseToIntBuffer(entries, *fInfo);
   
-  char *arr;
-  int array_size = 0;
-  int j = 0;
-  int numberOfChiffre = 0;
-
-  printf("%i bytes\n", fInfo->fileLength);
-
-  for(int i = 0; i < fInfo->fileLength - 1; i++){
-    
-    if(fInfo->buffer[i] != '\n'){
-      arr[j] = fInfo->buffer[i];
-      j++;
-      
-    }
-    else{
-      numberOfChiffre++;
-      if(j > array_size){
-        array_size = j;
-      }
-
-      chiffre = atoi(arr);
-      printf("%i\n", chiffre);
-      
-      for(int i = j; i < array_size; i++){
-        arr[i] = '\0';
-      }
-      j = 0;
-    }
+  for (int i = 0; i < fInfo->lines; i++) {
+	  printf("%i\n", entries[i]);
   }
+  return r;
 }
 
 void printBuffer(char* buffer, int length){
   for(int i = 0; i < length; i++){
     printf("%c", buffer[i]);
   }
+}
+
+int getNumberOfLines(char* buffer, int length) {
+	int numberOfLines = 1;
+
+	for (int i = 0; i < length; i++) {
+		if(buffer[i] == '\n'){
+			numberOfLines++;
+		}
+	}
+	return numberOfLines;
 }
 
 struct file* getFileData(char* filename){
@@ -70,25 +93,25 @@ struct file* getFileData(char* filename){
       fread(buffer, 1, fileLength, f);
     }
   }
-  
- 	fInfo = (struct file *)malloc(sizeof(struct file) + sizeof(char) + sizeof(int) * fileLength);
+  fclose(f);
 
-  fInfo->fileLength = fileLength;
-  fInfo->buffer = buffer;
+   fInfo = (struct file *)malloc(sizeof(struct file) + sizeof(int) * 2 + sizeof(char) * fileLength + 1);
+   fInfo->lines = getNumberOfLines(buffer, fileLength);
+   fInfo->size = fileLength;
+   fInfo->buffer = buffer;
 
-  return fInfo; 
+   return fInfo; 
 }
 
 int program(){
 	struct file *fInfo = getFileData("../data/input1.txt");
-  //printBuffer(fInfo->buffer, fInfo->fileLength);
-  struct report *r = getReport(fInfo);
-  
+	struct report *r = createReport(fInfo);
+
 	return 0;
 }
 
 int main(int argc, char* argv){
-
 	program();
+
 	return 0;
 }
