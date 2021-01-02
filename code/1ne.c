@@ -4,7 +4,8 @@
 #define MAX_CHAR 200
 
 struct report {
-	int entries[];
+	int* entries;
+  int size;
 };
 
 struct file {
@@ -49,13 +50,15 @@ void parseToIntBuffer(int * entries, struct file fInfo) {
 
 struct report* createReport(struct file *fInfo){
 
-  struct report *r = malloc(sizeof(int) * fInfo->lines);
+  struct report *r = malloc(sizeof(int) * fInfo->lines + sizeof(int) * 1);
   int *entries = malloc(sizeof(int) * fInfo->lines+1);
 
   parseToIntBuffer(entries, *fInfo);
-  
+ 
+  r->size = fInfo->lines;
+
   for (int i = 0; i < fInfo->lines; i++) {
-	  printf("%i\n", entries[i]);
+	  //printf("%i\n", entries[i]);
   }
   return r;
 }
@@ -103,9 +106,28 @@ struct file* getFileData(char* filename){
    return fInfo; 
 }
 
+int findSum(struct report *r){
+  int magic_input = 2020;
+  int sum = 0;
+
+  for(int i = 0; i < r->size-1; i++){
+    for(int j = i + 1; j < r->size-1; j++){
+      sum = r->entries[i]+r->entries[j];
+
+      if(sum == magic_input){
+        int result = r->entries[i] * r->entries[j];
+        return result;
+      }
+    }
+  }
+}
+
+
 int program(){
 	struct file *fInfo = getFileData("../data/input1.txt");
 	struct report *r = createReport(fInfo);
+  int result = findSum(r);
+  printf("%d", result);
 
 	return 0;
 }
