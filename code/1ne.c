@@ -8,9 +8,9 @@ struct report {
 };
 
 struct file {
-  int size;
-  char* buffer;
-  int lines;
+	int size;
+	char* buffer;
+	int lines;
 };
 
 void charBufferReinitialisation(char *buffer, int size){
@@ -46,20 +46,20 @@ void parseToIntBuffer(int * entries, struct file fInfo) {
 }
 
 struct report* createReport(struct file *fInfo){
-  struct report *r = malloc(sizeof(int) * fInfo->lines + sizeof(int) * 1);
-  int *entries = malloc(sizeof(int) * fInfo->lines+1);
+	struct report *r = malloc(sizeof(int) * fInfo->lines + sizeof(int) * 1);
+	int *entries = malloc(sizeof(int) * fInfo->lines+1);
 
-  parseToIntBuffer(entries, *fInfo);
+	parseToIntBuffer(entries, *fInfo);
  
-  r->size = fInfo->lines;
-  r->entries = entries;
-  return r;
+	r->size = fInfo->lines;
+	r->entries = entries;
+	return r;
 }
 
 void printBuffer(char* buffer, int length){
-  for(int i = 0; i < length; i++){
-    printf("%c", buffer[i]);
-  }
+	for(int i = 0; i < length; i++){
+    	printf("%c", buffer[i]);
+	}
 }
 
 int getNumberOfLines(char* buffer, int length) {
@@ -73,29 +73,29 @@ int getNumberOfLines(char* buffer, int length) {
 }
 
 struct file* getFileData(char* filename){
-  struct file *fInfo;
-  char* buffer = 0;
-  int fileLength = 0;
+	struct file *fInfo;
+	char* buffer = 0;
+	int fileLength = 0;
 
-  FILE* f = fopen(filename, "r");
-    
-  if(f){
-    fseek(f, 0, SEEK_END);
-    fileLength = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    buffer = malloc(fileLength);
-    if(buffer){
-      fread(buffer, 1, fileLength, f);
-    }
-  }
-  fclose(f);
+	FILE* f = fopen(filename, "r");
 
-   fInfo = (struct file *)malloc(sizeof(struct file) + sizeof(int) * 2 + sizeof(char) * fileLength + 1);
-   fInfo->lines = getNumberOfLines(buffer, fileLength);
-   fInfo->size = fileLength;
-   fInfo->buffer = buffer;
+	if(f){
+	fseek(f, 0, SEEK_END);
+	fileLength = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	buffer = malloc(fileLength);
+	if(buffer){
+	  fread(buffer, 1, fileLength, f);
+	}
+	}
+	fclose(f);
 
-   return fInfo; 
+	fInfo = (struct file *)malloc(sizeof(struct file) + sizeof(int) * 2 + sizeof(char) * fileLength + 1);
+	fInfo->lines = getNumberOfLines(buffer, fileLength);
+	fInfo->size = fileLength;
+	fInfo->buffer = buffer;
+
+	return fInfo; 
 }
 
 int findSumOf2(struct report *r){
@@ -157,6 +157,5 @@ int program(){
 
 int main(int argc, char* argv){
 	program();
-
 	return 0;
 }
