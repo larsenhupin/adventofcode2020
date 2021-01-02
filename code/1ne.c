@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #define MAX_CHAR 200
 
 struct report {
 	int* entries;
-  int size;
+	int size;
 };
 
 struct file {
@@ -14,7 +13,6 @@ struct file {
   int lines;
 };
 
-// Se faire une petite librairie de manipulation de string :)
 void charBufferReinitialisation(char *buffer, int size){
 	for (int i = 0; i < size; i++) {
 		buffer[i] = '\0';
@@ -27,8 +25,7 @@ void parseToIntBuffer(int * entries, struct file fInfo) {
 	int line = 0;
 	int array_size = 0;
 
-	for (int i = 0; i <= fInfo.size ; i++) {
-		
+	for (int i = 0; i <= fInfo.size ; i++) {		
 		if (fInfo.buffer[i] == '\n') {
 			if (nbOfChar > array_size) {
 				array_size = nbOfChar;
@@ -49,17 +46,13 @@ void parseToIntBuffer(int * entries, struct file fInfo) {
 }
 
 struct report* createReport(struct file *fInfo){
-
   struct report *r = malloc(sizeof(int) * fInfo->lines + sizeof(int) * 1);
   int *entries = malloc(sizeof(int) * fInfo->lines+1);
 
   parseToIntBuffer(entries, *fInfo);
  
   r->size = fInfo->lines;
-
-  for (int i = 0; i < fInfo->lines; i++) {
-	  //printf("%i\n", entries[i]);
-  }
+  r->entries = entries;
   return r;
 }
 
@@ -71,7 +64,6 @@ void printBuffer(char* buffer, int length){
 
 int getNumberOfLines(char* buffer, int length) {
 	int numberOfLines = 1;
-
 	for (int i = 0; i < length; i++) {
 		if(buffer[i] == '\n'){
 			numberOfLines++;
@@ -106,28 +98,59 @@ struct file* getFileData(char* filename){
    return fInfo; 
 }
 
-int findSum(struct report *r){
+int findSumOf2(struct report *r){
   int magic_input = 2020;
   int sum = 0;
+  int result = 0;
 
-  for(int i = 0; i < r->size-1; i++){
-    for(int j = i + 1; j < r->size-1; j++){
-      sum = r->entries[i]+r->entries[j];
+  for (int i = 0; i < r->size - 1; i++) {
+	  for (int j = i + 1; j < r->size; j++) {
+		  sum = r->entries[i] + r->entries[j];
 
-      if(sum == magic_input){
-        int result = r->entries[i] * r->entries[j];
-        return result;
-      }
-    }
+		  if (sum == magic_input) {
+			  int result = r->entries[i] * r->entries[j];
+			  return result;
+		  }
+	  }
   }
+  return result;
+}
+
+int findSumOf3(struct report *r) {
+	int magic_input = 2020;
+	int sum = 0;
+	int result = 0;
+
+	for (int i = 0; i < r->size; i++) {
+		for (int j = 0; j < r->size; j++) {
+			if(j == i)
+				continue;
+			for (int k = 0; k < r->size; k++) {
+				if(k == i || k == j){
+					continue;
+				}
+				else{
+				sum = r->entries[i] + r->entries[j] + r->entries[k];
+
+					if (sum == magic_input) {
+						int result = r->entries[i] * r->entries[j] * r->entries[k];
+						return result;
+					}
+				}
+			}
+		}
+	}
+	return result;
 }
 
 
 int program(){
 	struct file *fInfo = getFileData("../data/input1.txt");
 	struct report *r = createReport(fInfo);
-  int result = findSum(r);
-  printf("%d", result);
+
+	int resultSum2 = findSumOf2(r);
+	int resultSum3 = findSumOf3(r);
+	printf("Sum2 %d\nSum3 %d\n", resultSum2, resultSum3);
 
 	return 0;
 }
